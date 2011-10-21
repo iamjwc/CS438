@@ -1,0 +1,127 @@
+#include <iostream>
+#include <list>
+
+using namespace std;
+
+enum Direction { UP, DOWN, LEFT, RIGHT };
+
+struct Board
+{
+  Board( bool init = true )
+  {
+    if( init )
+      for( int i = 0; i < 7; ++i )
+        for( int j = 0; j < 7; ++j )
+          this->board[i][j] = 0;
+  }
+
+  void copy( Board& b )
+  {
+    for( int i = 0; i < 7; ++i )
+      for( int j = 0; j < 7; ++j )
+        b.board[i][j] = this->board[i][j]; 
+  }
+  
+  bool board[7][7];
+};
+
+ostream& operator<<( ostream& o, Board& b )
+{
+  for( int i = 0; i < 7; ++i )
+  {
+    for( int j = 0; j < 7; ++j )
+      o << b.board[i][j] << " "; 
+
+    o << endl;
+  }
+}
+
+
+bool is_on_board( char row, char col )
+{
+  return 
+    (
+      ((row >= 0 and row <= 1) and (col >= 2 and col <= 4))
+      or ((row >= 2 and row <= 4) and (col >= 0 and col <= 6))
+      or ((row >= 5 and row <= 6) and (col >= 2 and col <= 4))
+    );
+}
+
+bool is_open( char row, char col, const Board& b )
+{
+  return is_on_board( row, col ) && !b.board[row][col];
+}
+
+bool is_closed( char row, char col, const Board& b )
+{
+  return is_on_board( row, col ) && b.board[row][col];
+}
+
+void x_to_the( char x, Direction d, char& row, char& col )
+{
+  if( UP    == d ) row -= x;
+  if( DOWN  == d ) row += x;
+  if( LEFT  == d ) col -= x;
+  if( RIGHT == d ) col += x;
+} 
+
+bool can_jump( Direction d, char row, char col, const Board& board )
+{
+  char r = row, r2 = row, c = col, c2 = col;
+  x_to_the( 1, d, r, c );
+  x_to_the( 2, d, r2, c2 ); 
+
+  return( is_closed( row, col, board )
+      and is_closed( r, c, board )
+      and is_open( r2, c2, board ));
+}
+
+Board* jump( Direction d, char row, char col, const Board& b )
+{
+  Board* new_board = NULL;
+
+  if( can_jump( d, row, col, b ) )
+  {
+    char r = row, r2 = row, c = col, c2 = col;
+    x_to_the( 1, d, r, c );
+    x_to_the( 2, d, r2, c2 ); 
+
+    new_board = new Board(false);
+    b.copy(*new_board);
+
+    new_board->board[row][col] = 0;
+    new_board->board[r][c]     = 0;
+    new_board->board[r2][c2]   = 1;
+
+  }
+
+  return new_board;
+}
+
+Board** all_jumps_from_pos( char row, char col, const Board& b )
+{
+  Board** boards = new Board*[4];
+  boards[0] = jump( UP, row, col, b ); 
+  boards[1] = jump( DOWN, row, col, b );
+  b[2] = jump( LEFT, row, col, b );
+  b[3] = jump( RIGHT, row, col, b );
+
+  return boards;
+}
+
+int main()
+{
+  Board b;
+  b.board[3][3] = 1;
+  b.board[2][3] = 1;
+  
+  Board* new_board = jump( UP, 3, 3, b ); 
+
+  cout << b;
+  cout << endl;
+  cout << *new_board;
+
+  delete new_board;
+
+  return 0;
+}

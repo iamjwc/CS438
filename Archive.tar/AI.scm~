@@ -1,0 +1,58 @@
+(define folder   "z:\\")
+(define extension ".in")
+
+; Function takes a filename as a parameter and returns a board list
+(define get-board
+  (lambda (filename)
+    (let ((f (open-input-file (string-append folder filename extension))))
+      (let ((r read))  
+        (list
+          (list (r f) (r f) (r f))
+          (list (r f) (r f) (r f))
+          (list (r f) (r f) (r f) (r f) (r f) (r f) (r f))
+          (list (r f) (r f) (r f) (r f) (r f) (r f) (r f))
+          (list (r f) (r f) (r f) (r f) (r f) (r f) (r f))
+          (list (r f) (r f) (r f))
+          (list (r f) (r f) (r f))
+        )
+      )
+    )
+  )
+)
+
+; Function returns the row from a position list
+(define row
+  (lambda (pos)
+    (car pos)
+  )
+)
+
+; Function returns the column from a position list
+(define col
+  (lambda (pos)
+    (cadr pos)
+  )
+)
+
+; Function returns whether a position is currently on the board
+(define is-on-board?
+  (lambda (pos)
+    (or
+      ; If col < 2 and row < 4
+      (and (< (col pos) 2) (< (row pos) 4))
+      
+      (or
+        ; If (col > 1 and col < 5) and row < 7
+        (and (and (> col 1) (< col 5)) (< row 7))
+        ; If (col > 4 and col < 7) and row < 4
+        (and (and (> col 4) (< col 7)) (< row 4))
+      )
+    )
+  )
+)
+
+(define jump-left
+  (lambda (pos board)
+    (display board)
+  )
+)
